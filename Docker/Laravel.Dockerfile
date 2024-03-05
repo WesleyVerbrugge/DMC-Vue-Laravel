@@ -16,15 +16,19 @@ RUN apt-get update && \
 # Copy the local Laravel project files to the container
 COPY ./Laravel-Project/ /var/www/html/Laravel-Project
 
+# Change working directory to Laravel project
 WORKDIR /var/www/html/Laravel-Project
 
+# Run composer install as well as setting root as an allowed user to run composer install.
 RUN export COMPOSER_ALLOW_SUPERUSER=1; composer install
 
+# Change back to HTML directory
 WORKDIR /var/www/html
 
-# Set permissions for apache to be able to access /var/www/html
+# Set permissions for apache to be able to access html directory
 RUN chown -R www-data:www-data /var/www/html
 
+# Copy custom apache configuration to apache folder.
 COPY ./apache/default.conf /etc/apache2/sites-available/000-default.conf
 
 # Enable Apache modules
