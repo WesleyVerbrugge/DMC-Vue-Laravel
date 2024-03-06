@@ -1,4 +1,4 @@
-# Use an official image with apache as base
+# Use an official image with Apache as the base
 FROM php:8.3-apache
 
 # Set the working directory within the container /var/www/html
@@ -10,32 +10,25 @@ RUN apt-get update && \
         libzip-dev \
         unzip \
         git && \
-    docker-php-ext-install pdo_mysql zip && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    docker-php-ext-install pdo_mysql zip
+
+# Install Composer globally
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Copy the local Laravel project files to the container
 COPY ./Laravel-Project/ /var/www/html/Laravel-Project
 
-# Change working directory to Laravel project
-WORKDIR /var/www/html/Laravel-Project
+# Copy the shell script
+COPY laravel-entrypoint.sh /var/www/laravel-entrypoint.sh
 
-# Run composer install as well as setting root as an allowed user to run composer install.
-RUN export COMPOSER_ALLOW_SUPERUSER=1; composer install
+# Give execute permissions to the shell script
+RUN chmod +x /var/www/laravel-entrypoint.sh
 
-# Change back to HTML directory
-WORKDIR /var/www/html
-
-# Set permissions for apache to be able to access html directory
-RUN chown -R www-data:www-data /var/www/html
-
-# Copy custom apache configuration to apache folder.
+# Copy custom Apache configuration to Apache folder
 COPY ./apache/default.conf /etc/apache2/sites-available/000-default.conf
 
-# Enable Apache modules
-RUN a2enmod rewrite
-
-# Expose port 80 used by apache to the outside
+# Expose port 80 used by Apache to the outside
 EXPOSE 80
 
 # Specify the command to run on container start
-CMD ["apache2-foreground"]
+CMD ["/var/www/laravel-entrypoint.sh"]

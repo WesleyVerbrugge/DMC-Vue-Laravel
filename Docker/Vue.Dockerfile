@@ -7,9 +7,11 @@ WORKDIR /app
 # Copy the Vue.js project into the container at /app
 COPY ./vue-project .
 
-# Make port 80 available to the world outside this container
-EXPOSE 8080
+# Copy the shell script
+COPY vue-entrypoint.sh /usr/src/app/vue-entrypoint.sh
 
-# Run app.js when the container launches
-RUN npm install
-CMD ["npm", "run", "serve"]
+# Give execute permissions to the shell script
+RUN chmod +x /usr/src/app/vue-entrypoint.sh
+
+# Run the shell script to install dependencies and start the development server
+CMD ["/usr/src/app/vue-entrypoint.sh"]
