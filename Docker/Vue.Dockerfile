@@ -13,5 +13,8 @@ COPY vue-entrypoint.sh /usr/src/app/vue-entrypoint.sh
 # Give execute permissions to the shell script
 RUN chmod +x /usr/src/app/vue-entrypoint.sh
 
+# Expose port 80 used by Apache to the outside
+EXPOSE 8080
+
 # Run the shell script to install dependencies and start the development server
 CMD ["/usr/src/app/vue-entrypoint.sh"]
